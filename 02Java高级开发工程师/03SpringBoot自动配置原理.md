@@ -68,3 +68,51 @@
        }
        ```
 
+###### @ComponentScan
+
+- basePackages：指定要扫描的包路径，默认是注解所在类所在的包及其子包。
+
+- excludeFilters：设置排除规则，让哪些类不注入spring中。
+
+  ==TypeExcludeFilter：==
+
+  SpringBootApplication注解中的ComponentScan是这样写的
+
+  ```java
+  @ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+  		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+  public @interface SpringBootApplication {}
+  ```
+
+  我们如果要自己设置规则，那么需要写一个过滤类继承TypeExcludeFilter，重写match方法。
+
+  ```java
+  public class MyTypeExcludeFilter extends TypeExcludeFilter {
+  
+      @Override
+      public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory) throws IOException {
+          //如果是Hello类，就排除掉。
+          //TODO metadataReader.getClassMetadata可以获取到类的信息。但不能通过其getClass方法来判断是否是某个类的对象。这里的getClass方法存疑，所以就用getClassName来判断
+          return metadataReader.getClassMetadata().getClassName().equals(Hello.class.getName());
+      }
+  }
+  ```
+
+  类准备好后，在启动类上写@ComponentScan注解的时候，添加上这个过滤规则。
+
+  ```java
+  @ComponentScan(basePackages = "com.van",excludeFilters = {@Filter(type = FilterType.CUSTOM, classes = MyTypeExcludeFilter.class)})
+  public class Application {}
+  ```
+
+  //针对上述问题有一个疑问，@ComponentScan应该不存在覆盖吧，这个设置规则和另一个规则冲突了会怎么样？例如我typeexcludefilter设置Hello不注入，typeexcludeFilter2设置全部注入，试了一下答案是不会注入。
+
+  //还有一个问题，在SpringBootApplication中有ComponentScan这个注解，它设置的规则和我在外面启动类上设置的会有什么冲突吗？
+
+  我猜测底层可能是每一个被Component类似注解修饰的类过来都会走一遍过滤规则，一个类过来就所有规则都过一遍，如果都符合才注入，否则不会。这个类判断结束再判断下一个类
+
+  ==AutoConfigurationExcludeFilter：==
+
+  SpringBootApplication注解中的ComponentScan还有AutoConfigurationExcludeFilter，用来排除所有配置类`且是自动配置类`。
+
+  
