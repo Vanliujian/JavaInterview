@@ -1,4 +1,4 @@
-# 自动配置原理
+# 自动配置原理1
 
 <a href="https://www.processon.com/view/65354823d657a234397f6259#pc">笔记图解链接</a>
 
