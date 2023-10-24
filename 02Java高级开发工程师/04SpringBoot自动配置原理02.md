@@ -33,17 +33,47 @@ public class MyConfig {
 
 设置@ConfigurationProperties(prefix="")配置生效，如果使用@Component也可以使配置生效，EnableConfigurationProperties和Component两者选择其一就可以。
 
-@Conditional
+###### @Conditional
 
 <a href="https://docs.spring.io/spring-boot/docs/2.7.2/reference/html/features.html#features.developing-auto-configuration.condition-annotations">Conditional Annotation官网</a>
 
-- @ConditionalOnClass：如果某个类存在就为true
-- @ConditionalOnMissingClass：如果某个类不存在就为true
-- @ConditionalOnBean：如果某个Bean存在就为true
+- @ConditionalOnClass：如果某个`类存在`就为true
+
+- @ConditionalOnMissingClass：如果某个`类不存在`就为true
+
+- @ConditionalOnBean：如果某个`Bean存在`就为true
+
 - @ConditionalOnMissingBean：xxx
+
 - @ConditionalOnProperty：检查某个属性的值是否符合要求，符合即为true
+
+  - value：同name，表示属性的名称
+  - name：同value，表示属性的名称
+  - prefix：前缀
+  - matchIfMissing：default false。如果属性不存在返回false，不注入。
+  - havingValue：期望值
+
+  注意点：name和value都是数组，并不是说可以判定多个属性值为什么不同的值，而是多个属性值是否为某一个同一个值。
+
+  ```java
+  // 判断name1和name2是否都为true
+  @ConditionalOnProperty(prefix = "user", name = {"name1","name2"}, havingValue = "true")
+  ```
+
 - @ConditionalOnResource：存在特定资源时为true
+
+  ```java
+  @ConditionalOnResource(resources = "my-config.properties")
+  ```
+
 - @ConditionalOnWebApplication：如果是Web应用程序就为true
+
 - @ConditionalOnNotWebApplication：xxx
+
 - @ConditionalOnExpression：根据SpEL表达式的结果判断是否为true
+
+  ```java
+  // 不使用=号，而是使用:号。
+  @ConditionalOnExpression(value = "#{${user.name1:true} && ${user.name2:true}}")
+  ```
 
