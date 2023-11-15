@@ -147,6 +147,26 @@ logging:
 - %d{yyyy-MM-dd}表示日期
 - %i表示归档的第几个文件，从0开始
 
+归档的文件会和日志文件在同一个文件夹下
+
+`每个springboot自带的logback版本有不一样，看每个版本对应官网的配置应该是什么样的`
+
+```yaml
+#每个版本的配置方式都不一样，去官网查看即可。
+#springboot 2.7.2配置
+#logging:
+#  logback:
+#    rollingpolicy:
+#      file-name-pattern: ${LOG_FILE}.%d{yyyy-MM-dd}.%i.gz
+#      max-file-size: 1KB
+
+#springboot 2.2.0.RELEASE配置
+#logging:
+#  file:
+#    name: /Users/liujian/repository/interview-parent/mylog.log
+#    max-size: 1KB
+```
+
 
 
 ## 自定义配置文件
@@ -334,4 +354,5 @@ logging:
 
 1. Logback没有Fatal级别，它被映射到error中。
 1. slf4j桥接器只能有一个
+1. 每个springboot版本对应的配置都不一样，要去对应版本的官网查看配置。
 

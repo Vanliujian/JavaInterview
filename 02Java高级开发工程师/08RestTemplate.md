@@ -158,6 +158,80 @@ public class OrderTest {
 }
 ```
 
+# 通过RestTemplate调用protobuf接口
+
+controller接口
+
+```java
+@ApiOperation("添加用户")
+@ApiImplicitParam(name = "user", value = "用户",dataType = "User",required = true,paramType = "body")
+@ApiResponse(code = 200,message = "success",response = Result.class)
+@RequestMapping(value = "/add", consumes = "application/x-protobuf",produces = "application/x-protobuf")
+public MessageProto.Result add(@RequestBody MessageProto.User user) {
+
+    User user1 = new User(user.getId(), user.getName(), user.getAge());
+    List<User> users = orderService.add(user1);
+    MessageProto.Result.Builder builder = MessageProto.Result.newBuilder();
+    builder.setCode(200);
+    builder.setData(users.toString());
+    MessageProto.Result build = builder.build();
+    return build;
+}
+```
+
+resttemplate调用:
+
+调用的时候需要一个HttpMessageConverter。
+
+```java
+@Test
+public void restTemplateCallProtobufTest() throws InvalidProtocolBufferException {
+  ProtobufHttpMessageConverter protobufHttpMessageConverter = new ProtobufHttpMessageConverter();
+  RestTemplate restTemplate = new RestTemplate();
+
+  MessageProto.User user = MessageProto.User.newBuilder()
+    .setId(7)
+    .setName("777")
+    .setAge(27)
+    .build();
+
+  byte[] byteArray = user.toByteArray();
+
+  HttpHeaders httpHeaders = new HttpHeaders();
+  httpHeaders.add("Content-Type", "application/x-protobuf");
+
+
+  HttpEntity<byte[]> httpEntity = new HttpEntity<>(byteArray,httpHeaders);
+
+  ResponseEntity<byte[]> responseEntity = restTemplate.exchange("http://localhost:8081/order/add", HttpMethod.POST, httpEntity, byte[].class);
+  byte[] body = responseEntity.getBody();
+
+  System.out.println(MessageProto.User.parseFrom(body));
+
+}
+
+```
+
+HttpMessageConverter：
+
+http的request和response转换器，接收到请求的时候判断是否能读，能读就读。返回结果的时候判断是否能写，能写就写。
+
+当客户端向spring mvc发送一个请求的时候，spring mvc会根据请求中的content-Type来选择合适的HttpMessageConverter。
+
+当服务器响应的时候会根据请求中的Accept头部信息选择合适的HttpMessageConverter来处理响应数据，以便客户端能读。
+
+HttpMessageConverter提供了两个注解和两个类型@RequestBody、@ResponseBody、RequestEntity、ResponseEntity
+
+当服务端接收到请求，根据content-Type决定给哪个httpmessageconverter进行解析，解析后的Java对象作为方法传递给控制器方法，即controller中的方法。
+
+
+
+
+
+
+
+
+
 
 
 > 注意
