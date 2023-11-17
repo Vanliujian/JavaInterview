@@ -90,3 +90,20 @@ public class SwaggerConfig3 {
 }
 ```
 
+## 常用注解：
+
+| 注解               | 目标                        |
+| ------------------ | --------------------------- |
+| @Api               | class                       |
+| @ApiOperation      | method                      |
+| @ApiParam          | method、field               |
+| @ApiModel          | class                       |
+| @ApiModelProperty  | method、field               |
+| @ApiIgnore         | class、method、method field |
+| @ApiImplicitParam  | method                      |
+| @ApiImplicitParams | method                      |
+
+
+
+
+
