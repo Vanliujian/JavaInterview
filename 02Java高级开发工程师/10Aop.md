@@ -184,14 +184,12 @@
           public Result<List<User>> showAll() {
               //......
           }
-      
-      
       }
       ```
 
 ## JoinPoint
 
-包含和切入相关的信息，比如切入点的对象方法属性等。java
+包含和切入相关的信息，比如切入点的对象方法属性等。
 
 ## ProceedingJoinPoint
 
@@ -221,6 +219,53 @@ public interface ProceedingJoinPoint extends JoinPoint {
 - Object getTarget()：获取连接点所在的目标对象
 
   
+
+## 顺序
+
+当一个方法被多个Around切入的时候，可以设置他们的顺序，使用@Order注解。
+
+aop，是这样执行的，把多个对于同一个方法的advice，先调用前面的执行，执行到proceed的时候，将后面的advice都嵌入到前面的proceed中。
+
+即便有多个aspect切面切入，被切入环绕通知的方法是只执行一次的
+
+```java
+@Around("@annotation(myAspectAnnotation)")
+public Object around2(ProceedingJoinPoint joinPoint,MyAspectAnnotation myAspectAnnotation) {
+  log.info("qian");
+  Object proceed;
+  try {
+    proceed = joinPoint.proceed();
+    System.out.println(JSON.toJSONString(proceed));
+  } catch (Throwable throwable) {
+    throw new RuntimeException(throwable);
+  }
+  log.info("hou"+myAspectAnnotation.value());
+  return proceed;
+}
+
+
+@Around("@annotation(apiOperation)")
+public Object around1(ProceedingJoinPoint joinPoint,MyAspectAnnotation apiOperation) {
+  log.info("qian API");
+  Object proceed;
+  try {
+    proceed = joinPoint.proceed();
+    System.out.println(JSON.toJSONString(proceed));
+  } catch (Throwable throwable) {
+    throw new RuntimeException(throwable);
+  }
+  log.info("hou APIOPERATION"+apiOperation.value());
+  return proceed;
+}
+输出结果：
+2023-12-20 22:58:02.055  INFO 33518 --- [nio-8081-exec-1] com.aspect.OrderAspect                   : qian API
+2023-12-20 22:58:02.055  INFO 33518 --- [nio-8081-exec-1] com.aspect.OrderAspect                   : qian
+=======================================
+{"code":200,"data":[{"age":21,"id":1,"name":"yi"},{"age":22,"id":2,"name":"er"},{"age":23,"id":3,"name":"san"},{"age":24,"id":4,"name":"si"},{"age":25,"id":5,"name":"wu"}],"message":"success"}
+2023-12-20 22:58:02.162  INFO 33518 --- [nio-8081-exec-1] com.aspect.OrderAspect                   : hou查询所有用户
+{"code":200,"data":[{"age":21,"id":1,"name":"yi"},{"age":22,"id":2,"name":"er"},{"age":23,"id":3,"name":"san"},{"age":24,"id":4,"name":"si"},{"age":25,"id":5,"name":"wu"}],"message":"success"}
+2023-12-20 22:58:02.163  INFO 33518 --- [nio-8081-exec-1] com.aspect.OrderAspect                   : hou APIOPERATION查询所有用户
+```
 
 
 

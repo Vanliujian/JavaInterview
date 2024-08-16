@@ -121,7 +121,7 @@ public class HelloController {
 - put
 - delete
 - exchange
-- execute
+- execute:在exchange的基础上，可以通过Callback对请求和响应进行处理
 
 在Test中也可以使用TestRestTemplate
 
@@ -181,12 +181,11 @@ public MessageProto.Result add(@RequestBody MessageProto.User user) {
 
 resttemplate调用:
 
-调用的时候需要一个HttpMessageConverter。
+调用的时候需要一个HttpMessageConverter。如果不使用messageConverter那可以先用二进制流传输
 
 ```java
 @Test
 public void restTemplateCallProtobufTest() throws InvalidProtocolBufferException {
-  ProtobufHttpMessageConverter protobufHttpMessageConverter = new ProtobufHttpMessageConverter();
   RestTemplate restTemplate = new RestTemplate();
 
   MessageProto.User user = MessageProto.User.newBuilder()
@@ -209,8 +208,35 @@ public void restTemplateCallProtobufTest() throws InvalidProtocolBufferException
   System.out.println(MessageProto.User.parseFrom(body));
 
 }
-
 ```
+
+```java
+@Test
+public void restTemplateCallProtobufTest2() {
+  ProtobufHttpMessageConverter protobufHttpMessageConverter = new ProtobufHttpMessageConverter();
+  RestTemplate restTemplate = new RestTemplate();
+  restTemplate.getMessageConverters()
+    .add(protobufHttpMessageConverter);
+
+  MessageProto.User user = MessageProto.User.newBuilder()
+    .setId(7)
+    .setName("777")
+    .setAge(27)
+    .build();
+
+  HttpHeaders httpHeaders = new HttpHeaders();
+  httpHeaders.add("Content-Type", "application/x-protobuf");
+
+
+  HttpEntity<MessageProto.User> httpEntity = new HttpEntity<>(user,httpHeaders);
+
+  ResponseEntity<MessageProto.Result> responseEntity = restTemplate.exchange("http://localhost:8081/order/add", HttpMethod.POST, httpEntity, MessageProto.Result.class);
+  System.out.println(responseEntity.getBody());
+
+}
+```
+
+
 
 HttpMessageConverter：
 

@@ -8,13 +8,13 @@
 
 2. 功能：元注解提供了自定义注解的元信息，保留策略，目标元素类型，是否被继承等信息。
 
-3. 常用的元注解：
+3. 常用的元注解：==速记（俩瑞是他的倒影）==
 
    - @Retention：指定自定义注解的保留策略，注解在何时有效。
 
      提供了三种策略:
 
-     1. RetentionPolicy.SOURCE，不包含在编译后的字节码文件，也不在运行环境中。
+     1. RetentionPolicy.SOURCE，不包含在编译后的字节码文件，也不在运行环境中。比如@Data注解
      2. RetentionPolicy.CLASS，注解被编译时会保留在字节码文件中，但不会在运行环境中。
      3. RetentionPolicy.RUNTIME，注解会被编译保存到字节码，也可以在运行时通过反射获取。可以在程序运行时影响类的行为。
 
@@ -178,7 +178,7 @@ public class MyConfig {
    }
    ```
 
-2. import一个实现了ImportBeanDefinitionRegistar接口的类，在重写的registerBeanDefinitions方法里面，能拿到BeanDefinitionRegistry的注册器，能手工往beanDefinitionMap中注册beanDefinition。
+2. import一个实现了ImportBeanDefinitionRegistrar接口的类，在重写的registerBeanDefinitions方法里面，能拿到BeanDefinitionRegistry的注册器，能手工往beanDefinitionMap中注册beanDefinition。
 
    ```java
    public class Test1 {
