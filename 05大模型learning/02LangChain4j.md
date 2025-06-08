@@ -53,7 +53,7 @@ public void testChatWithFunction() {
 ```java
 WanxImageModel model = WanxImageModel.builder()
   .modelName("wanx2.1-t2i-plus")
-  .apiKey("sk-dd1783721ceb4f1f99032a4fa756dccd")
+  .apiKey("xxx")
   .build();
 Response<Image> generate = model.generate("猫咪");
 System.out.println(generate.content().url());
